@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to Task Attacker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles_index.css">
+</head>
+<body>
+
+  <div class="blob"></div>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <h1><span>Task Attacker</span></h1>
+      <p class="sub">
+        Task Attacker is the best way to stay focused and complete your goals.Get started by creating an account or logging in to access all features.
+        Join thousands of users already enjoying our service.
+      </p>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="openModal('login')">Login</button>
+        <button class="btn btn-secondary" onclick="openModal('signup')">Sign Up</button>
+      </div>
+      <div class="proof">
+        <div class="avatars">
+          <div class="avatar">NO</div>
+          <div class="avatar">AT</div>
+          <div class="avatar">JL</div>
+          <div class="avatar">MG</div>
+          <div class="avatar">NS</div>
+        </div>
+        <p class="proof-text">Made by Aryan, Nathan, Nathan, Jesus, and Manuel</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay" id="login-overlay" onclick="handleOverlayClick(event,'login')">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('login')" aria-label="Close">&times;</button>
+      <h2>Welcome back</h2>
+      <p class="modal-sub">Sign in to your account to continue.</p>
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button id= "login-account-submit" class="btn btn-primary">Login</button>
+      <div class="modal-footer">
+        Don't have an account? <a href="#" onclick="switchModal('login','signup'); return false;">Sign up</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNUP MODAL -->
+  <div class="modal-overlay" id="signup-overlay" onclick="handleOverlayClick(event,'signup')">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('signup')" aria-label="Close">&times;</button>
+      <h2>Create account</h2>
+      <p class="modal-sub">Start your journey — it only takes a moment.</p>
+      <div class="field">
+        <label for="signup-name">Full Name</label>
+        <input type="text" id="signup-name" placeholder="Jane Smith" autocomplete="name"/>
+      </div>
+      <div class="field">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="field">
+        <label for="signup-password">Password</label>
+        <input type="password" id="signup-password" placeholder="Create a strong password" autocomplete="new-password"/>
+      </div>
+      <button id="create-account-submit" class="btn btn-primary">Create Account</button>
+      <div class="modal-footer">
+        Already have an account? <a href="#" onclick="switchModal('signup','login'); return false;">Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/index.js"></script>
+</body>
+</html>
