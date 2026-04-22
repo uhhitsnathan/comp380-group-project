@@ -1,11 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Task Attacker - Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles_home.css"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#1d2024",
+            "surface-variant": "#23262a",
+            "on-error": "#450900",
+            "on-tertiary-fixed": "#463900",
+            "on-secondary": "#5a5300",
+            "tertiary-container": "#fdd73e",
+            "inverse-on-surface": "#535559",
+            "surface-container-highest": "#23262a",
+            "on-surface-variant": "#aaabaf",
+            "background": "#0c0e11",
+            "surface": "#0c0e11",
+            "on-primary": "#536000",
+            "on-secondary-fixed": "#464000",
+            "primary-fixed-dim": "#ceea38",
+            "surface-dim": "#0c0e11",
+            "on-tertiary": "#665400",
+            "on-surface": "#f9f9fd",
+            "tertiary-fixed-dim": "#eec930",
+            "on-secondary-fixed-variant": "#645d00",
+            "error-dim": "#d53d18",
+            "secondary-container": "#676000",
+            "surface-tint": "#e2fe4c",
+            "secondary-dim": "#e5d843",
+            "on-primary-fixed": "#3f4900",
+            "primary": "#e2fe4c",
+            "surface-container": "#171a1d",
+            "primary-container": "#b0ca0d",
+            "on-tertiary-container": "#5c4b00",
+            "on-primary-container": "#353f00",
+            "tertiary-fixed": "#fdd73e",
+            "inverse-primary": "#576500",
+            "primary-dim": "#d4ef3e",
+            "inverse-surface": "#f9f9fd",
+            "secondary": "#f4e650",
+            "surface-container-lowest": "#000000",
+            "on-tertiary-fixed-variant": "#675500",
+            "tertiary-dim": "#eec930",
+            "tertiary": "#ffe797",
+            "secondary-fixed": "#f4e650",
+            "on-primary-fixed-variant": "#596700",
+            "on-secondary-container": "#fff9d4",
+            "secondary-fixed-dim": "#e5d843",
+            "primary-fixed": "#dcf847",
+            "surface-bright": "#292c31",
+            "on-error-container": "#ffd2c8",
+            "surface-container-low": "#111417",
+            "error": "#ff7351",
+            "error-container": "#b92902",
+            "on-background": "#f9f9fd",
+            "outline": "#747579",
+            "outline-variant": "#46484b"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "headline": ["Space Grotesk"],
+            "body": ["Manrope"],
+            "label": ["Lexend"]
+          }
+        },
+      },
+    }
+  </script>
 </head>
-<body>
-    <p>Home page content goes here.</p>
+<body class="bg-background text-on-surface antialiased mb-24">
+
+  <!-- TopNavBar -->
+  <nav class="fixed top-0 w-full z-50 bg-black/60 backdrop-blur-xl flex justify-between items-center px-6 h-16">
+    <div class="text-2xl font-black text-lime-400 italic uppercase font-['Space_Grotesk'] tracking-tight">Task Attacker</div>
+    <div class="flex items-center gap-6">
+      <button class="flex items-center gap-2 text-zinc-400 hover:text-lime-300 transition-colors scale-95 active:duration-100 font-['Lexend'] text-xs font-bold uppercase tracking-widest">
+        <span class="material-symbols-outlined" data-icon="home">home</span>
+        <span>Home</span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-6 pt-24 pb-12">
+
+    <!-- User Header Section -->
+    <section class="relative mb-12">
+      <div class="flex flex-col md:flex-row items-center gap-8 bg-surface-container-low p-8 rounded-lg">
+
+        <!-- Profile Image -->
+        <div class="relative">
+          <input accept="image/*" class="hidden" id="avatarInput" type="file"/>
+          <div class="relative cursor-pointer group" onclick="document.getElementById('avatarInput').click()">
+            <div class="w-32 h-32 md:w-44 md:h-44 rounded-full p-1.5 bg-gradient-to-tr from-primary via-primary-container to-surface-container-highest shadow-[0_0_30px_rgba(226,254,76,0.3)] overflow-hidden">
+              <img alt="User profile avatar" class="w-full h-full object-cover rounded-full bg-surface-container-highest" id="profileAvatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9QnrCpNhRnjHEYK35K9hFAskXEgMOaR7lNztGFGLEYI3eGmykNPqmfSvVnnP1RfEFXRuJdcr2GEApo6yMAUUbK2qwcFFRyc3ArAiXE3zOrCFaFXuA0wscytwoQblsIsHLbonTKU9TiqNONYjSn3hscBIiwcSyHIhG_n-_Cv9w8PIZ-cEkFtXhYMI6a_d4QFCODyBhPCTVojkvCIFYRR8oI5VFdFI4uDtO0jXFgc9lltgWNfgEldRcgwGGZy0GMxgP4j2vyv49Yk4"/>
+              <div class="absolute inset-1.5 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span class="material-symbols-outlined text-white text-3xl" data-icon="photo_camera">photo_camera</span>
+              </div>
+            </div>
+            <div class="absolute top-0 right-0 bg-primary-container text-on-primary-container p-2 rounded-full border-4 border-surface-container-low shadow-lg group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-sm block" data-icon="edit">edit</span>
+            </div>
+          </div>
+          <div class="absolute -bottom-2 -right-2 bg-primary text-black font-['Lexend'] font-bold text-sm px-4 py-1 rounded-full border-4 border-surface-container-low shadow-xl z-10 pointer-events-none">
+            LVL 42
+          </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="flex-1 text-center md:text-left">
+          <h1 id="welcome-username" class="font-['Space_Grotesk'] font-extrabold text-4xl md:text-6xl tracking-tighter text-on-surface mb-2 uppercase italic">
+            Loading...
+          </h1>
+          <p id="welcome-email" class="font-['Manrope'] text-on-surface-variant text-sm mt-1"></p>
+          <div class="flex flex-wrap justify-center md:justify-start gap-4 mt-4">
+            <span class="bg-surface-container-highest text-primary font-['Lexend'] text-xs font-semibold px-3 py-1 rounded-sm uppercase tracking-widest flex items-center gap-2">
+              <span class="material-symbols-outlined text-[14px]" data-icon="shield" style="font-variation-settings: 'FILL' 1;">shield</span>
+              Elite Striker
+            </span>
+            <span class="bg-surface-container-highest text-on-surface-variant font-['Lexend'] text-xs font-semibold px-3 py-1 rounded-sm uppercase tracking-widest">
+              Joined Mar 2024
+            </span>
+          </div>
+        </div>
+
+        <!-- XP Bar -->
+        <div class="hidden lg:block w-48 h-2 bg-surface-container-highest rounded-full overflow-hidden self-end mb-4">
+          <div class="h-full bg-primary w-3/4 rounded-full"></div>
+          <p class="text-[10px] font-['Lexend'] uppercase tracking-widest text-on-surface-variant mt-2 text-right">XP TO LEVEL UP: 1,240</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Stats Bento Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <!-- Tasks Completed -->
+      <div class="bg-surface-container-high p-6 rounded-lg group hover:bg-surface-container-highest transition-all duration-300">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-primary text-3xl" data-icon="assignment" style="font-variation-settings: 'FILL' 1;">assignment</span>
+          <span class="text-xs font-['Lexend'] text-primary bg-primary/10 px-2 py-0.5 rounded-sm uppercase font-bold">+12%</span>
+        </div>
+        <p class="font-['Lexend'] text-xs text-on-surface-variant uppercase tracking-widest mb-1">Tasks Completed</p>
+        <p class="font-['Space_Grotesk'] text-5xl font-bold text-on-surface">1,482</p>
+      </div>
+      <!-- Current Streak -->
+      <div class="bg-surface-container-high p-6 rounded-lg group hover:bg-surface-container-highest transition-all duration-300">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-error text-3xl" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+          <span class="text-xs font-['Lexend'] text-error bg-error/10 px-2 py-0.5 rounded-sm uppercase font-bold">Hot</span>
+        </div>
+        <p class="font-['Lexend'] text-xs text-on-surface-variant uppercase tracking-widest mb-1">Current Streak</p>
+        <div class="flex items-baseline gap-2">
+          <p class="font-['Space_Grotesk'] text-5xl font-bold text-on-surface">24</p>
+          <span class="font-['Space_Grotesk'] text-xl font-bold text-on-surface-variant uppercase">Days</span>
+        </div>
+      </div>
+      <!-- Habits Formed -->
+      <div class="bg-surface-container-high p-6 rounded-lg group hover:bg-surface-container-highest transition-all duration-300">
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-secondary text-3xl" data-icon="rocket_launch" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+          <span class="text-xs font-['Lexend'] text-on-surface-variant uppercase font-bold italic">Top 5%</span>
+        </div>
+        <p class="font-['Lexend'] text-xs text-on-surface-variant uppercase tracking-widest mb-1">Habits Formed</p>
+        <p class="font-['Space_Grotesk'] text-5xl font-bold text-on-surface">18</p>
+      </div>
+    </section>
+
+    <!-- Badges Section -->
+    <section>
+      <div class="flex justify-between items-end mb-8 border-b border-outline-variant/30 pb-6">
+        <div>
+          <h2 class="font-['Space_Grotesk'] text-3xl font-bold uppercase italic tracking-tighter">Badges</h2>
+          <p class="font-['Lexend'] text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mt-1">Proof of Performance</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="scripts/home.js"></script>
 </body>
 </html>
