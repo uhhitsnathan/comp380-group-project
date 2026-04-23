@@ -1,7 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getUserByEmail, createUser, emailExists } from '../data/login.js';
+import { getUserByEmail, createUser, emailExists, getTasksByUserId, createTask, toggleTask } from '../data/login.js';
+
 
 const router = express.Router();
 
@@ -21,6 +22,21 @@ const sendTokenCookie = (res, token) => {
         sameSite: 'lax',  // protects against cross-site request forgery
         maxAge: 7 * 24 * 60 * 60 * 1000  // 7 days in milliseconds
     });
+};
+
+// --- Helper: verify the JWT from the cookie ---
+const verifyToken = (req, res) => {
+    const token = req.cookies.token;
+    if (!token) {
+        res.status(401).json({ error: 'Not logged in.' });
+        return null;
+    }
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+        res.status(401).json({ error: 'Invalid or expired session.' });
+        return null;
+    }
 };
 
 // --- SIGNUP ---
@@ -110,6 +126,60 @@ router.get('/me', (req, res) => {
     }
 });
 
+// --- GET /api/tasks ---
+router.get('/tasks', async (req, res) => {
+    const decoded = verifyToken(req, res);
+    if (!decoded) return;
+
+    try {
+        const tasks = await getTasksByUserId(decoded.user_id);
+        res.json(tasks);
+    } catch (error) {
+        console.error('Get tasks error:', error);
+        res.status(500).json({ error: 'Server error fetching tasks.' });
+    }
+});
+
+// --- POST /api/tasks ---
+router.post('/tasks', async (req, res) => {
+    const decoded = verifyToken(req, res);
+    if (!decoded) return;
+
+    const { name, description } = req.body;
+    if (!name) {
+        return res.status(400).json({ error: 'Task name is required.' });
+    }
+
+    try {
+        const task = await createTask(decoded.user_id, name, description || '');
+        res.status(201).json(task);
+    } catch (error) {
+        console.error('Create task error:', error);
+        res.status(500).json({ error: 'Server error creating task.' });
+    }
+});
+
+// --- PATCH /api/tasks/:id ---
+router.patch('/tasks/:id', async (req, res) => {
+    const decoded = verifyToken(req, res);
+    if (!decoded) return;
+
+    const taskId = parseInt(req.params.id);
+    if (isNaN(taskId)) {
+        return res.status(400).json({ error: 'Invalid task ID.' });
+    }
+
+    try {
+        const task = await toggleTask(taskId, decoded.user_id);
+        if (!task) {
+            return res.status(404).json({ error: 'Task not found.' });
+        }
+        res.json(task);
+    } catch (error) {
+        console.error('Toggle task error:', error);
+        res.status(500).json({ error: 'Server error updating task.' });
+    }
+});
 
 
 export default router;
