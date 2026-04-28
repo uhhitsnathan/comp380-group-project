@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Task Attacker - Tasks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Manrope:wght@300;400;500;600;700;800&family=Lexend:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="styles_home.css" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed-variant": "#645d00",
+            "tertiary-fixed-dim": "#eec930",
+            "surface-container-low": "#111417",
+            "primary-container": "#b0ca0d",
+            "on-background": "#f9f9fd",
+            "on-surface": "#f9f9fd",
+            "on-primary": "#536000",
+            "surface-container-lowest": "#000000",
+            "on-tertiary": "#665400",
+            "on-surface-variant": "#aaabaf",
+            "primary-fixed": "#dcf847",
+            "tertiary-fixed": "#fdd73e",
+            "outline": "#747579",
+            "error-dim": "#d53d18",
+            "tertiary-dim": "#eec930",
+            "tertiary-container": "#fdd73e",
+            "background": "#0c0e11",
+            "secondary-fixed": "#f4e650",
+            "on-error": "#450900",
+            "inverse-on-surface": "#535559",
+            "surface-bright": "#292c31",
+            "primary-dim": "#d4ef3e",
+            "on-tertiary-fixed": "#463900",
+            "on-secondary": "#5a5300",
+            "primary-fixed-dim": "#ceea38",
+            "on-tertiary-container": "#5c4b00",
+            "surface-variant": "#23262a",
+            "surface": "#0c0e11",
+            "on-secondary-fixed": "#464000",
+            "on-primary-fixed": "#3f4900",
+            "secondary-container": "#676000",
+            "inverse-surface": "#f9f9fd",
+            "on-error-container": "#ffd2c8",
+            "surface-tint": "#e2fe4c",
+            "on-primary-container": "#353f00",
+            "on-primary-fixed-variant": "#596700",
+            "outline-variant": "#46484b",
+            "surface-dim": "#0c0e11",
+            "secondary-dim": "#e5d843",
+            "secondary": "#f4e650",
+            "error": "#ff7351",
+            "secondary-fixed-dim": "#e5d843",
+            "surface-container-high": "#1d2024",
+            "surface-container-highest": "#23262a",
+            "on-secondary-container": "#fff9d4",
+            "error-container": "#b92902",
+            "inverse-primary": "#576500",
+            "on-tertiary-fixed-variant": "#675500",
+            "surface-container": "#171a1d",
+            "tertiary": "#ffe797",
+            "primary": "#e2fe4c"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "headline": ["Space Grotesk"],
+            "display": ["Space Grotesk"],
+            "body": ["Manrope"],
+            "label": ["Lexend"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-black min-h-screen">
+
+  <!-- TopAppBar -->
+  <header class="bg-black/60 backdrop-blur-2xl fixed top-0 z-50 flex justify-between items-center w-full px-6 h-20">
+    <div class="flex items-center gap-4">
+      <a class="flex items-center" href="home.html">
+        <span class="material-symbols-outlined text-[#e2fe4c] transition-transform scale-95 active:scale-90" data-icon="home">home</span>
+      </a>
+      <span class="text-2xl font-black text-[#e2fe4c] italic font-['Space_Grotesk'] tracking-tighter uppercase">TASK ATTACKER</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center pl-4 border-l border-zinc-800">
+        <a class="block hover:opacity-80 transition-opacity" href="home.html">
+          <img alt="User avatar" id="nav-avatar" class="w-10 h-10 rounded-lg object-cover border border-[#e2fe4c]/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmWsXDYT0ybpFNyuYECDpVKmDAH543xVCdiQ4j5UpmoIfeWfcthM81v9rxcFkteq2W1CLVqG4mOkDFGc2Xt9ZO59_dxN6iwWVVYnyoX-2u4liZLv8in78beGDVeZOy9QHH50refZ62uVgcE3A9Bb3awAs4FmZK-yI-iWpShDe0cuf0U0V9MSfRD_fLct5LG2ygwT6bGgoMbWuyWQRewhH_7490DzQauM_tQHV-2W_fO0r1dwsiukluNm1Ch8OEiyhm9mAHCvxx3iY"/>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-28 pb-12 px-6 max-w-[1600px] mx-auto flex flex-col gap-8">
+
+    <!-- Top Stats Bar -->
+    <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div class="bg-surface-container-low p-6 flex flex-col gap-1">
+        <span class="text-[10px] font-['Lexend'] text-primary font-bold tracking-[0.2em] uppercase">Tasks Completed</span>
+        <div class="flex items-end gap-3">
+          <span id="stat-completed" class="text-5xl font-black font-headline italic tracking-tighter text-on-surface">0</span>
+          <span class="material-symbols-outlined text-primary mb-2" data-icon="trending_up">trending_up</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-low p-6 flex flex-col gap-1 border-l-4 border-primary/20">
+        <span class="text-[10px] font-['Lexend'] text-zinc-500 font-bold tracking-[0.2em] uppercase">Current Active</span>
+        <div class="flex items-end gap-3">
+          <span id="stat-active" class="text-5xl font-black font-headline italic tracking-tighter text-primary">0</span>
+          <span class="text-xs font-['Lexend'] text-zinc-400 mb-2 uppercase font-bold">In Progress</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-low p-6 flex flex-col gap-1 border-l-4 border-primary/20">
+        <span class="text-[10px] font-['Lexend'] text-zinc-500 font-bold tracking-[0.2em] uppercase">Efficiency</span>
+        <div class="flex items-center gap-4">
+          <span id="stat-efficiency" class="text-5xl font-black font-headline italic tracking-tighter text-on-surface">0%</span>
+          <div class="flex-1 h-2 bg-zinc-800 relative overflow-hidden">
+            <div id="efficiency-bar" class="absolute top-0 left-0 h-full bg-primary" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- Active Tasks -->
+      <section class="lg:col-span-8 flex flex-col gap-6">
+        <div class="flex justify-between items-center px-2">
+          <h2 class="text-3xl font-black font-headline italic uppercase tracking-tighter text-on-surface flex items-center gap-3">
+            <span class="w-2 h-8 bg-primary block"></span>
+            Active Tasks
+          </h2>
+          <button id="open-add-task" class="bg-primary text-black font-['Lexend'] font-black text-[10px] px-4 py-2 uppercase tracking-[0.15em] flex items-center gap-2 hover:bg-primary-dim transition-all">
+            <span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+            New Task
+          </button>
+        </div>
+
+        <!-- Active task list — populated by tasks.js -->
+        <div id="active-task-list" class="flex flex-col gap-4">
+          <p class="font-['Lexend'] text-on-surface-variant text-sm px-2">Loading tasks...</p>
+        </div>
+      </section>
+
+      <!-- Task History (Completed) -->
+      <aside class="lg:col-span-4 flex flex-col gap-6">
+        <div class="flex items-center gap-2 px-2">
+          <span class="material-symbols-outlined text-zinc-500" data-icon="history">history</span>
+          <h2 class="text-xl font-bold font-headline italic uppercase tracking-tighter text-zinc-500">Task History</h2>
+        </div>
+
+        <!-- Completed task list — populated by tasks.js -->
+        <div id="completed-task-list" class="bg-surface-container-low p-2 custom-scrollbar max-h-[800px] overflow-y-auto">
+          <p class="font-['Lexend'] text-on-surface-variant text-sm p-4">No completed tasks yet.</p>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Add Task Modal -->
+  <div class="fixed inset-0 z-[100] flex items-center justify-center hidden" id="addTaskModal">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-md" id="modal-backdrop"></div>
+    <div class="relative bg-surface-container p-8 md:p-12 w-full max-w-lg mx-4 rounded-xl border border-outline-variant shadow-2xl overflow-hidden">
+      <div class="absolute top-0 right-0 p-4">
+        <button id="close-add-task" class="text-on-surface-variant hover:text-white transition-colors">
+          <span class="material-symbols-outlined" data-icon="close">close</span>
+        </button>
+      </div>
+      <div class="mb-10 text-center">
+        <h2 class="font-['Space_Grotesk'] text-4xl font-extrabold uppercase italic tracking-tighter text-primary">New Task</h2>
+        <p class="font-['Lexend'] text-xs text-on-surface-variant uppercase tracking-widest mt-2">Initialize Mission Parameters</p>
+      </div>
+      <div class="space-y-6">
+        <div class="space-y-1">
+          <label class="font-['Lexend'] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Task Name</label>
+          <input
+            id="task-name-input"
+            class="w-full bg-surface-container-highest border-none focus:ring-2 focus:ring-primary text-on-surface font-['Manrope'] p-4 rounded-sm"
+            placeholder="Objective name"
+            type="text"/>
+        </div>
+        <div class="space-y-1">
+          <label class="font-['Lexend'] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Task Description</label>
+          <textarea
+            id="task-desc-input"
+            class="w-full bg-surface-container-highest border-none focus:ring-2 focus:ring-primary text-on-surface font-['Manrope'] p-4 rounded-sm resize-none"
+            placeholder="Briefing details..."
+            rows="3"></textarea>
+        </div>
+        <p id="task-error" class="text-error text-xs font-['Lexend'] hidden"></p>
+        <button
+          id="submit-add-task"
+          class="w-full bg-primary hover:bg-primary-container text-black font-['Space_Grotesk'] font-black py-4 rounded-lg uppercase italic tracking-widest text-lg transition-all shadow-[0_0_20px_rgba(226,254,76,0.3)]">
+          Launch Task
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB for mobile -->
+  <button id="fab-add-task" class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-black flex items-center justify-center rounded-none shadow-[0_0_30px_rgba(226,254,76,0.3)] hover:scale-105 active:scale-95 transition-all z-50 md:hidden">
+    <span class="material-symbols-outlined text-3xl font-bold" data-icon="add">add</span>
+  </button>
+
+  <script src="scripts/tasks.js"></script>
+</body>
+</html>

@@ -17,7 +17,7 @@ fetch('/api/me')
     window.location.href = 'index.html';
   });
 
-// --- Load and render tasks from the API ---
+// --- Load and render only active (incomplete) tasks ---
 const loadTasks = async () => {
   try {
     const res = await fetch('/api/tasks');
@@ -26,19 +26,23 @@ const loadTasks = async () => {
       return;
     }
     const tasks = await res.json();
-    renderTasks(tasks);
+    const active = tasks.filter(t => !t.completed);
+    const completed = tasks.filter(t => t.completed);
+
+    renderTasks(active);
+    document.getElementById('stat-completed').textContent = completed.length;
   } catch (err) {
     console.error('Error loading tasks:', err);
   }
 };
 
-// --- Render tasks into the task list ---
+// --- Render active tasks into the task list ---
 const renderTasks = (tasks) => {
   const taskList = document.getElementById('task-list');
 
   if (tasks.length === 0) {
     taskList.innerHTML = `
-      <p class="font-['Lexend'] text-on-surface-variant text-sm">No tasks yet. Add one below!</p>
+      <p class="font-['Lexend'] text-on-surface-variant text-sm">No active tasks. Add one below!</p>
     `;
     return;
   }
@@ -50,13 +54,12 @@ const renderTasks = (tasks) => {
           class="peer appearance-none w-6 h-6 border-2 border-primary rounded-sm checked:bg-primary transition-all cursor-pointer"
           type="checkbox"
           data-task-id="${task.task_id}"
-          ${task.completed ? 'checked' : ''}
           onchange="handleToggle(${task.task_id}, this)"
         />
         <span class="material-symbols-outlined absolute left-0 text-black text-lg opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none">check</span>
       </div>
       <div class="flex flex-col">
-        <span id="task-name-${task.task_id}" class="font-['Lexend'] text-on-surface text-lg transition-all ${task.completed ? 'line-through text-on-surface-variant/50' : ''}">
+        <span id="task-name-${task.task_id}" class="font-['Lexend'] text-on-surface text-lg transition-all">
           ${task.name}
         </span>
         ${task.description ? `<span class="font-['Manrope'] text-on-surface-variant text-xs mt-0.5">${task.description}</span>` : ''}
@@ -65,7 +68,7 @@ const renderTasks = (tasks) => {
   `).join('');
 };
 
-// --- Toggle a task complete/incomplete ---
+// --- Toggle a task and remove it from the list on completion ---
 const handleToggle = async (taskId, checkbox) => {
   try {
     const res = await fetch(`/api/tasks/${taskId}`, { method: 'PATCH' });
@@ -73,15 +76,7 @@ const handleToggle = async (taskId, checkbox) => {
       checkbox.checked = !checkbox.checked;
       return;
     }
-    const updated = await res.json();
-
-    // Use the unique ID to reliably find the name span
-    const nameSpan = document.getElementById(`task-name-${taskId}`);
-    if (updated.completed) {
-      nameSpan.classList.add('line-through', 'text-on-surface-variant/50');
-    } else {
-      nameSpan.classList.remove('line-through', 'text-on-surface-variant/50');
-    }
+    loadTasks(); // 👈 re-renders the list, completed task will be filtered out
   } catch (err) {
     console.error('Error toggling task:', err);
     checkbox.checked = !checkbox.checked;
@@ -143,11 +138,16 @@ document.getElementById('submit-add-task').addEventListener('click', async () =>
     }
 
     closeModal();
-    loadTasks(); // Reload the task list to show the new task
+    loadTasks();
   } catch (e) {
     err.textContent = 'Something went wrong. Please try again.';
     err.classList.remove('hidden');
   }
+});
+
+// --- Navigate to completed tasks page ---
+document.getElementById('tasks-completed-card').addEventListener('click', () => {
+  window.location.href = 'tasks.html';
 });
 
 // --- Avatar upload preview ---
