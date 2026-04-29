@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>TASK ATTACKER | HABIT CONTROL</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=Lexend:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="styles_home.css" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface": "#e2e2e6",
+            "on-tertiary-fixed": "#181c21",
+            "tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#44474a",
+            "on-tertiary-container": "#61656b",
+            "primary-fixed-dim": "#b8d31c",
+            "inverse-primary": "#576500",
+            "inverse-on-surface": "#2f3034",
+            "surface-container": "#1e2023",
+            "error": "#ffb4ab",
+            "on-primary-fixed-variant": "#414c00",
+            "surface-variant": "#333538",
+            "tertiary-fixed-dim": "#c3c6cd",
+            "on-secondary-fixed": "#191c1f",
+            "tertiary-fixed": "#e0e2e9",
+            "surface-container-lowest": "#0c0e11",
+            "surface-tint": "#b8d31c",
+            "primary": "#ffffff",
+            "secondary-fixed": "#e1e2e7",
+            "inverse-surface": "#e2e2e6",
+            "on-primary-fixed": "#191e00",
+            "on-tertiary-fixed-variant": "#43474d",
+            "surface": "#111317",
+            "surface-dim": "#111317",
+            "on-background": "#e2e2e6",
+            "primary-container": "#d4ef3e",
+            "outline-variant": "#464834",
+            "surface-bright": "#37393d",
+            "surface-container-highest": "#333538",
+            "on-secondary-container": "#babcc0",
+            "secondary-fixed-dim": "#c5c6cb",
+            "secondary": "#c5c6cb",
+            "tertiary-container": "#e0e2e9",
+            "outline": "#90937b",
+            "on-error": "#690005",
+            "on-primary": "#2c3400",
+            "surface-container-low": "#1a1c1f",
+            "primary-fixed": "#d4ef3e",
+            "on-tertiary": "#2d3136",
+            "on-primary-container": "#5c6b00",
+            "error-container": "#93000a",
+            "secondary-container": "#494c4f",
+            "surface-container-high": "#282a2d",
+            "on-secondary": "#2e3134",
+            "on-surface-variant": "#c6c9ae",
+            "on-error-container": "#ffdad6",
+            "background": "#111317"
+          },
+          "fontFamily": {
+            "label-caps": ["Lexend"],
+            "h1": ["Space Grotesk"],
+            "mono-data": ["Space Grotesk"],
+            "body-lg": ["Manrope"],
+            "label-md": ["Lexend"],
+            "h3": ["Space Grotesk"],
+            "h2": ["Space Grotesk"],
+            "body-md": ["Manrope"]
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "9999px"
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container min-h-screen">
+
+  <!-- TOP NAVIGATION -->
+  <header class="bg-black/60 backdrop-blur-2xl fixed top-0 z-50 flex justify-between items-center w-full px-6 h-20 border-b border-white/5">
+    <div class="flex items-center gap-4">
+      <a class="flex items-center" href="home.html">
+        <span class="material-symbols-outlined text-[#e2fe4c]" data-icon="home">home</span>
+      </a>
+      <span class="text-2xl font-black text-[#e2fe4c] italic font-['Space_Grotesk'] tracking-tighter uppercase">TASK ATTACKER</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center pl-4 border-l border-zinc-800">
+        <a class="block hover:opacity-80 transition-opacity" href="home.html">
+          <img alt="User avatar" id="nav-avatar" class="w-10 h-10 rounded-lg object-cover border border-[#e2fe4c]/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmWsXDYT0ybpFNyuYECDpVKmDAH543xVCdiQ4j5UpmoIfeWfcthM81v9rxcFkteq2W1CLVqG4mOkDFGc2Xt9ZO59_dxN6iwWVVYnyoX-2u4liZLv8in78beGDVeZOy9QHH50refZ62uVgcE3A9Bb3awAs4FmZK-yI-iWpShDe0cuf0U0V9MSfRD_fLct5LG2ygwT6bGgoMbWuyWQRewhH_7490DzQauM_tQHV-2W_fO0r1dwsiukluNm1Ch8OEiyhm9mAHCvxx3iY"/>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-28 pb-12 px-6 max-w-[1600px] mx-auto flex flex-col gap-8">
+
+    <!-- TOP STATS BAR -->
+    <section class="grid grid-cols-1 gap-6 md:grid-cols-3">
+     <div class="bg-surface-container-low p-6 flex flex-col gap-1 group hover:bg-surface-container-high transition-colors">
+        <span class="text-[10px] font-label-caps text-[#e2fe4c] font-bold tracking-[0.2em] uppercase">Best Streak</span>
+        <div class="flex items-end gap-3">
+          <span class="text-5xl font-black font-h1 italic tracking-tighter text-on-surface">--</span>
+          <span class="text-xs font-label-caps text-zinc-400 mb-2 uppercase font-bold">Coming Soon</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-low p-6 flex flex-col gap-1 border-l-4 border-[#e2fe4c]/20">
+        <span class="text-[10px] font-label-caps text-zinc-500 font-bold tracking-[0.2em] uppercase">Active Habits</span>
+        <div class="flex items-end gap-3">
+          <span id="stat-active" class="text-5xl font-black font-h1 italic tracking-tighter text-glow text-[#e2fe4c]">0</span>
+          <span class="text-xs font-label-caps text-zinc-400 mb-2 uppercase font-bold">Missions</span>
+        </div>
+      </div>
+      <div class="bg-surface-container-low p-6 flex flex-col gap-1 border-l-4 border-[#e2fe4c]/20">
+        <span class="text-[10px] font-label-caps text-zinc-500 font-bold tracking-[0.2em] uppercase">Today's Progress</span>
+        <div class="flex items-center gap-4">
+          <span id="stat-today" class="text-5xl font-black font-h1 italic tracking-tighter text-on-surface">0%</span>
+          <div class="flex-1 h-2 bg-zinc-800 relative overflow-hidden">
+            <div id="today-bar" class="absolute top-0 left-0 h-full bg-[#e2fe4c]" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- HABIT LIST -->
+      <section class="lg:col-span-8 flex flex-col gap-6">
+        <div class="flex justify-between items-center px-2">
+          <h2 class="text-3xl font-black font-h1 italic uppercase tracking-tighter text-on-surface flex items-center gap-3">
+            <span class="w-2 h-8 bg-[#e2fe4c] block"></span>
+            Current Discipline
+          </h2>
+          <button id="new-habit-btn" class="bg-[#e2fe4c] text-black font-label-caps font-black text-[10px] px-4 py-2 uppercase tracking-[0.15em] flex items-center gap-2 hover:brightness-110 transition-all">
+            <span class="material-symbols-outlined text-sm">add</span>
+            New Habit
+          </button>
+        </div>
+
+        <!-- Habit list — populated by habits.js -->
+        <div id="habit-list" class="flex flex-col gap-4">
+          <p class="font-['Lexend'] text-on-surface-variant text-sm px-2">Loading habits...</p>
+        </div>
+      </section>
+
+      <!-- SIDEBAR: TODAY'S HABITS -->
+      <aside class="lg:col-span-4 flex flex-col gap-6">
+        <div class="flex items-center gap-2 px-2">
+          <span class="material-symbols-outlined text-zinc-500">task_alt</span>
+          <h2 class="text-xl font-bold font-h1 italic uppercase tracking-tighter text-zinc-500">Today's Missions</h2>
+        </div>
+
+        <!-- Today's habit list — populated by habits.js -->
+        <div id="today-habit-list" class="bg-surface-container-low p-2 custom-scrollbar max-h-[800px] overflow-y-auto border border-white/5">
+          <p class="font-['Lexend'] text-on-surface-variant text-sm p-4">Loading...</p>
+        </div>
+
+        <div class="bg-[#1b1f24] p-6 border-l-4 border-[#e2fe4c]">
+          <p class="font-mono text-[10px] text-[#e2fe4c] uppercase tracking-widest mb-1">OPERATIONAL_DATA</p>
+          <p class="font-body-md text-xs text-on-surface-variant leading-relaxed italic">
+            Stay consistent. Habits compound over time — even a 1% improvement each day leads to massive results over the year.
+          </p>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- New Habit Modal -->
+  <div class="fixed inset-0 z-[100] flex items-center justify-center hidden" id="addHabitModal">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-md" id="habit-modal-backdrop"></div>
+    <div class="relative bg-surface-container p-8 md:p-12 w-full max-w-lg mx-4 rounded-xl border border-outline-variant shadow-2xl overflow-hidden">
+      <div class="absolute top-0 right-0 p-4">
+        <button id="close-habit-modal" class="text-on-surface-variant hover:text-white transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="mb-8 text-center">
+        <h2 class="font-['Space_Grotesk'] text-4xl font-extrabold uppercase italic tracking-tighter text-[#e2fe4c]">New Habit</h2>
+        <p class="font-['Lexend'] text-xs text-on-surface-variant uppercase tracking-widest mt-2">Define Your Discipline</p>
+      </div>
+      <div class="space-y-6">
+
+        <!-- Name -->
+        <div class="space-y-1">
+          <label class="font-['Lexend'] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Habit Name</label>
+          <input
+            id="habit-name-input"
+            class="w-full bg-surface-container-highest border-none focus:ring-2 focus:ring-[#e2fe4c] text-on-surface font-['Manrope'] p-4 rounded-sm"
+            placeholder="e.g. Morning Run"
+            type="text"/>
+        </div>
+
+        <!-- Description -->
+        <div class="space-y-1">
+          <label class="font-['Lexend'] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Description</label>
+          <textarea
+            id="habit-desc-input"
+            class="w-full bg-surface-container-highest border-none focus:ring-2 focus:ring-[#e2fe4c] text-on-surface font-['Manrope'] p-4 rounded-sm resize-none"
+            placeholder="What does completing this habit look like?"
+            rows="2"></textarea>
+        </div>
+
+        <!-- Frequency -->
+        <div class="space-y-2">
+          <label class="font-['Lexend'] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Frequency</label>
+          <div class="flex gap-3">
+            <button data-freq="daily" class="freq-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase tracking-widest border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Daily</button>
+            <button data-freq="weekly" class="freq-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase tracking-widest border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Weekly</button>
+            <button data-freq="specific" class="freq-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase tracking-widest border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Specific Days</button>
+          </div>
+        </div>
+
+        <!-- Day picker (shown only when specific is selected) -->
+        <div id="day-picker" class="hidden space-y-2">
+          <label class="font-['Lexend'] text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Select Days</label>
+          <div class="flex gap-2">
+            <button data-day="0" class="day-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Su</button>
+            <button data-day="1" class="day-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Mo</button>
+            <button data-day="2" class="day-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Tu</button>
+            <button data-day="3" class="day-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">We</button>
+            <button data-day="4" class="day-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Th</button>
+            <button data-day="5" class="day-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Fr</button>
+            <button data-day="6" class="day-btn flex-1 py-2 text-[10px] font-['Lexend'] font-bold uppercase border border-outline-variant text-on-surface-variant hover:border-[#e2fe4c] hover:text-[#e2fe4c] transition-all">Sa</button>
+          </div>
+        </div>
+
+        <p id="habit-error" class="text-error text-xs font-['Lexend'] hidden"></p>
+
+        <button
+          id="submit-habit"
+          class="w-full bg-[#e2fe4c] hover:brightness-110 text-black font-['Space_Grotesk'] font-black py-4 rounded-lg uppercase italic tracking-widest text-lg transition-all shadow-[0_0_20px_rgba(226,254,76,0.3)]">
+          Deploy Habit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile bottom navbar -->
+  <nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 bg-[#0c0e11] border-t-2 border-[#e2fe4c] shadow-[0_-4px_12px_rgba(226,254,76,0.15)]">
+    <a class="flex flex-col items-center justify-center text-[#e2fe4c] opacity-60 transition-all" href="home.html">
+      <span class="material-symbols-outlined">home</span>
+      <span class="font-mono text-[10px] uppercase font-black">Home</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-[#0c0e11] bg-[#e2fe4c] px-4 py-1 transition-all" href="habits.html">
+      <span class="material-symbols-outlined">rebase</span>
+      <span class="font-mono text-[10px] uppercase font-black">Habits</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-[#e2fe4c] opacity-60 transition-all" href="tasks.html">
+      <span class="material-symbols-outlined">task_alt</span>
+      <span class="font-mono text-[10px] uppercase font-black">Tasks</span>
+    </a>
+  </nav>
+
+  <script src="scripts/habits.js"></script>
+</body>
+</html>

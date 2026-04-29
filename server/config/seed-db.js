@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 const dropTables = async () => {
     try {
         console.log('dropping tables...');
+        await pool.query(`DROP TABLE IF EXISTS habit_completions;`);
+        await pool.query(`DROP TABLE IF EXISTS habits;`);
         await pool.query(`DROP TABLE IF EXISTS tasks;`);
         await pool.query(`DROP TABLE IF EXISTS users;`);
         console.log('tables dropped.');
@@ -22,6 +24,7 @@ const createTables = async () => {
                 username   TEXT NOT NULL UNIQUE,
                 email      TEXT NOT NULL UNIQUE,
                 password   TEXT NOT NULL,
+                avatar_url TEXT DEFAULT NULL,
                 created_at TIMESTAMP DEFAULT NOW()
             );
         `);
@@ -45,6 +48,40 @@ const createTables = async () => {
         console.log('successfully created tasks table');
     } catch (error) {
         console.error('Error creating tasks table:', error);
+    }
+
+       try {
+        console.log('creating habits table...');
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS habits (
+                habit_id     SERIAL PRIMARY KEY,
+                user_id      INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                name         TEXT NOT NULL,
+                description  TEXT,
+                frequency    TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly', 'specific')),
+                days_of_week INTEGER[] DEFAULT NULL,
+                created_at   TIMESTAMP DEFAULT NOW()
+            );
+        `);
+        console.log('successfully created habits table');
+    } catch (error) {
+        console.error('Error creating habits table:', error);
+    }
+
+        try {
+        console.log('creating habit_completions table...');
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS habit_completions (
+                completion_id  SERIAL PRIMARY KEY,
+                habit_id       INTEGER NOT NULL REFERENCES habits(habit_id) ON DELETE CASCADE,
+                user_id        INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                completed_date DATE NOT NULL DEFAULT CURRENT_DATE,
+                UNIQUE(habit_id, completed_date)
+            );
+        `);
+        console.log('successfully created habit_completions table');
+    } catch (error) {
+        console.error('Error creating habit_completions table:', error);
     }
 };
 
@@ -72,6 +109,16 @@ const insertData = async () => {
                 [userId]
             );
             console.log('successfully added test tasks');
+             // Sample habits
+            await pool.query(
+                `INSERT INTO habits (user_id, name, description, frequency, days_of_week) VALUES
+                ($1, 'Morning Run', 'Run at least 2 miles every morning.', 'daily', NULL),
+                ($1, 'Read', 'Read at least 20 pages of a book.', 'daily', NULL),
+                ($1, 'Gym', 'Strength training session.', 'specific', '{1,3,5}'),
+                ($1, 'Weekly Review', 'Review goals and plan for the week ahead.', 'weekly', NULL);`,
+                [userId]
+            );
+            console.log('successfully added test habits');
         }
 
         console.log('successfully added test data to users table');

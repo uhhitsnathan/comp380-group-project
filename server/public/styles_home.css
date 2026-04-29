@@ -15,3 +15,18 @@ body {
     background: rgba(35, 38, 42, 0.6);
     backdrop-filter: blur(20px);
 }
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #0c0e11;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #23262a;
+    border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #e2fe4c;
+}

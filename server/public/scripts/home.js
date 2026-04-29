@@ -11,7 +11,11 @@ fetch('/api/me')
     if (!data) return;
     document.getElementById('welcome-username').textContent = data.username;
     document.getElementById('welcome-email').textContent = data.email;
+     if (data.avatar_url) {
+      document.getElementById('profileAvatar').src = data.avatar_url;
+    }
     loadTasks();
+    loadHabits();
   })
   .catch(() => {
     window.location.href = 'index.html';
@@ -36,6 +40,83 @@ const loadTasks = async () => {
   }
 };
 
+
+// --- Load and render today's habits ---
+const loadHabits = async () => {
+  try {
+    const res = await fetch('/api/habits/today');
+    if (!res.ok) return;
+    const habits = await res.json();
+    renderHabits(habits);
+  } catch (err) {
+    console.error('Error loading habits:', err);
+  }
+};
+
+// --- Render today's habits ---
+const renderHabits = (habits) => {
+  const habitList = document.getElementById('habit-list');
+
+  if (habits.length === 0) {
+    habitList.innerHTML = `
+      <p class="font-['Lexend'] text-on-surface-variant text-sm">No habits due today. Add some on the habits page!</p>
+    `;
+    return;
+  }
+
+  habitList.innerHTML = habits.map(habit => `
+    <label class="flex items-center gap-4 bg-surface-container-low p-5 rounded-lg border border-outline-variant/10 ${habit.completed_today ? '' : 'hover:border-primary/30'} transition-all group ${habit.completed_today ? '' : 'cursor-pointer'}">
+      <div class="relative flex items-center">
+        <input
+          class="peer appearance-none w-6 h-6 border-2 border-primary rounded-sm checked:bg-primary transition-all ${habit.completed_today ? 'cursor-default' : 'cursor-pointer'}"
+          type="checkbox"
+          ${habit.completed_today ? 'checked disabled' : ''}
+          ${!habit.completed_today ? `onchange="handleHabitToggle(${habit.habit_id}, this)"` : ''}
+        />
+      </div>
+      <div class="flex flex-col">
+        <span id="habit-name-${habit.habit_id}" class="font-['Lexend'] text-on-surface text-lg transition-all ${habit.completed_today ? 'line-through text-on-surface-variant/50' : ''}">
+          ${habit.name}
+        </span>
+        ${habit.description ? `<span class="font-['Manrope'] text-on-surface-variant text-xs mt-0.5">${habit.description}</span>` : ''}
+      </div>
+    </label>
+  `).join('');
+};
+
+// --- Toggle a habit complete/incomplete for today ---
+const handleHabitToggle = async (habitId, checkbox) => {
+  const today = new Date().toISOString().split('T')[0];
+  const method = checkbox.checked ? 'POST' : 'DELETE';
+
+  try {
+    const res = await fetch(`/api/habits/${habitId}/complete`, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: today })
+    });
+
+    if (!res.ok) {
+      checkbox.checked = !checkbox.checked;
+      return;
+    }
+
+    // Update the visual style without re-rendering
+    const nameSpan = document.getElementById(`habit-name-${habitId}`);
+    const label = checkbox.closest('label');
+    if (checkbox.checked) {
+      nameSpan.classList.add('line-through', 'text-on-surface-variant/50');
+      label.classList.add('opacity-60');
+    } else {
+      nameSpan.classList.remove('line-through', 'text-on-surface-variant/50');
+      label.classList.remove('opacity-60');
+    }
+  } catch (err) {
+    console.error('Error toggling habit:', err);
+    checkbox.checked = !checkbox.checked;
+  }
+};
+
 // --- Render active tasks into the task list ---
 const renderTasks = (tasks) => {
   const taskList = document.getElementById('task-list');
@@ -56,7 +137,6 @@ const renderTasks = (tasks) => {
           data-task-id="${task.task_id}"
           onchange="handleToggle(${task.task_id}, this)"
         />
-        <span class="material-symbols-outlined absolute left-0 text-black text-lg opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none">check</span>
       </div>
       <div class="flex flex-col">
         <span id="task-name-${task.task_id}" class="font-['Lexend'] text-on-surface text-lg transition-all">
@@ -76,7 +156,7 @@ const handleToggle = async (taskId, checkbox) => {
       checkbox.checked = !checkbox.checked;
       return;
     }
-    loadTasks(); // 👈 re-renders the list, completed task will be filtered out
+    loadTasks(); 
   } catch (err) {
     console.error('Error toggling task:', err);
     checkbox.checked = !checkbox.checked;
@@ -150,17 +230,57 @@ document.getElementById('tasks-completed-card').addEventListener('click', () => 
   window.location.href = 'tasks.html';
 });
 
-// --- Avatar upload preview ---
+// --- Avatar upload ---
 const avatarInput = document.getElementById('avatarInput');
 const profileAvatar = document.getElementById('profileAvatar');
 
-avatarInput.addEventListener('change', function(e) {
+avatarInput.addEventListener('change', async function(e) {
   const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      profileAvatar.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
+  if (!file) return;
+
+  // Preview immediately so it feels responsive
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    profileAvatar.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+
+  // Upload to server and save permanently
+  try {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const res = await fetch('/api/avatar', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      console.error('Avatar upload failed');
+      return;
+    }
+
+    const data = await res.json();
+    // Set the real saved URL in case the preview differs
+    profileAvatar.src = data.avatar_url;
+  } catch (err) {
+    console.error('Error uploading avatar:', err);
   }
+});
+
+
+// --- Logout ---
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  try {
+    await fetch('/api/logout', { method: 'POST' });
+  } catch (err) {
+    console.error('Logout error:', err);
+  } finally {
+    window.location.href = 'index.html';
+  }
+});
+
+// --- Navigate to habits page ---
+document.getElementById('open-habits-page').addEventListener('click', () => {
+  window.location.href = 'habits.html';
 });

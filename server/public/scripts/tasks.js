@@ -9,6 +9,9 @@ fetch('/api/me')
   })
   .then(data => {
     if (!data) return;
+     if (data.avatar_url) {
+      document.getElementById('nav-avatar').src = data.avatar_url;
+    }
     loadTasks();
   })
   .catch(() => {

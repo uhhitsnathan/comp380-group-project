@@ -88,9 +88,9 @@
   <nav class="fixed top-0 w-full z-50 bg-black/60 backdrop-blur-xl flex justify-between items-center px-6 h-16">
     <div class="text-2xl font-black text-lime-400 italic uppercase font-['Space_Grotesk'] tracking-tight">Task Attacker</div>
     <div class="flex items-center gap-6">
-      <button class="flex items-center gap-2 text-zinc-400 hover:text-lime-300 transition-colors scale-95 active:duration-100 font-['Lexend'] text-xs font-bold uppercase tracking-widest">
-        <span class="material-symbols-outlined" data-icon="home">home</span>
-        <span>Back to Login</span>
+      <button id="logout-btn" class="flex items-center gap-2 text-zinc-400 hover:text-lime-300 transition-colors scale-95 active:duration-100 font-['Lexend'] text-xs font-bold uppercase tracking-widest">
+        <span class="material-symbols-outlined" data-icon="logout">logout</span>
+        <span>Back To Login</span>
       </button>
     </div>
   </nav>
@@ -145,7 +145,7 @@
     <!-- Stats Bento Grid -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
       <!-- Tasks Completed -->
-      <div id="tasks-completed-card" class="bg-surface-container-high p-6 rounded-lg group hover:bg-surface-container-highest transition-all duration-300 cursor-pointer">
+      <div id="tasks-completed-card" class="bg-surface-container-high p-6 rounded-lg group hover:bg-surface-container-highest transition-all duration-300 cursor-pointer hover:shadow-[0_0_30px_rgba(226,254,76,0.25)] hover:border hover:border-primary/40 border border-transparent">
         <div class="flex justify-between items-start mb-4">
           <span class="material-symbols-outlined text-primary text-3xl" data-icon="assignment" style="font-variation-settings: 'FILL' 1;">assignment</span>
         </div>
@@ -188,7 +188,7 @@
         </div>
 
         <!-- Task list — populated by home.js -->
-        <div id="task-list" class="space-y-3 mb-8 flex-1">
+        <div id="task-list" class="space-y-3 mb-8 overflow-y-auto custom-scrollbar" style="max-height: 400px;">
           <p class="font-['Lexend'] text-on-surface-variant text-sm">Loading tasks...</p>
         </div>
 
@@ -199,21 +199,27 @@
         </button>
       </div>
 
-      <!-- Right Column: Coming Soon -->
+      <!-- Right Column: Habits Preview -->
       <div class="flex flex-col h-full">
         <div class="flex justify-between items-end mb-6 border-b border-outline-variant/30 pb-4">
           <div>
-            <h2 class="font-['Space_Grotesk'] text-3xl font-bold uppercase italic tracking-tighter">Coming Soon</h2>
-            <p class="font-['Lexend'] text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mt-1">Future Intel</p>
+            <h2 class="font-['Space_Grotesk'] text-3xl font-bold uppercase italic tracking-tighter">Today's Habits</h2>
+            <p class="font-['Lexend'] text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mt-1">Daily Missions</p>
           </div>
         </div>
-        <div class="flex-1 flex flex-col items-center justify-center bg-surface-container-low/50 rounded-lg border-2 border-dashed border-outline-variant/20 p-8 text-center group hover:border-outline-variant/40 transition-all">
-          <span class="material-symbols-outlined text-outline-variant text-6xl mb-4 group-hover:scale-110 transition-transform" data-icon="lock">lock</span>
-          <p class="font-['Lexend'] text-xs text-on-surface-variant uppercase tracking-widest font-semibold">Under Development</p>
-          <p class="font-['Manrope'] text-sm text-on-surface-variant/60 mt-2 max-w-[240px]">New modules are being initialized for deployment. Stay tuned for advanced tracking systems.</p>
-        </div>
-      </div>
 
+        <!-- Habit list — populated by home.js -->
+        <div id="habit-list" class="space-y-3 mb-8 overflow-y-auto custom-scrollbar flex-1" style="max-height: 400px;">
+          <p class="font-['Lexend'] text-on-surface-variant text-sm">Loading habits...</p>
+        </div>
+
+        <button
+          id="open-habits-page"
+          class="w-full bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/20 hover:border-primary/40 hover:shadow-[0_0_30px_rgba(226,254,76,0.15)] text-on-surface font-['Space_Grotesk'] font-black py-5 rounded-lg uppercase italic tracking-wider text-xl transition-all active:scale-[0.98]">
+          View All Habits
+        </button>
+      </div>
+      
     </section>
 
     <!-- Badges Section -->
