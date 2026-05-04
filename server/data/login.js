@@ -321,3 +321,14 @@ export const getStreak = async (userId) => {
     );
     return result.rows[0]?.streak || 0;
 };
+
+// Delete a habit and all its completions
+export const deleteHabit = async (habitId, userId) => {
+    const result = await pool.query(
+        `DELETE FROM habits
+         WHERE habit_id = $1 AND user_id = $2
+         RETURNING habit_id`,
+        [habitId, userId]
+    );
+    return result.rows[0];
+};
