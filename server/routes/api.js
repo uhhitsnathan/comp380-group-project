@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import { getUserByEmail, createUser, emailExists,
     getTasksByUserId, createTask, toggleTask,
     updateAvatar,
@@ -15,6 +16,13 @@ import { getUserByEmail, createUser, emailExists,
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const deleteHabitLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
+});
 
 
 //save avatar stuff to /public/uploads/avatars 
@@ -528,7 +536,7 @@ router.get('/habits/:id/completions', async (req, res) => {
 
 
 // --- DELETE /api/habits/:id ---
-router.delete('/habits/:id', async (req, res) => {
+router.delete('/habits/:id', deleteHabitLimiter, async (req, res) => {
     const decoded = verifyToken(req, res);
     if (!decoded) return;
 
