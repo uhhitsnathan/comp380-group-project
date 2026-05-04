@@ -4,7 +4,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getUserByEmail, createUser, emailExists, getTasksByUserId, createTask, toggleTask, updateAvatar, getHabitsByUserId, createHabit, logHabitCompletion, removeHabitCompletion, getHabitCompletionsByDate, getHabitCompletionsById, getHabitCompletionsForWeek, calculateStreak, updateStreak, getStreak } from '../data/login.js';
+import { getUserByEmail, createUser, emailExists,
+    getTasksByUserId, createTask, toggleTask,
+    updateAvatar,
+    getHabitsByUserId, createHabit, logHabitCompletion, removeHabitCompletion, getHabitCompletionsByDate, getHabitCompletionsById, getHabitCompletionsForWeek,
+    calculateStreak, updateStreak, getStreak,
+    deleteHabit } from '../data/login.js';
 
 
 const router = express.Router();
@@ -522,6 +527,26 @@ router.get('/habits/:id/completions', async (req, res) => {
 });
 
 
+// --- DELETE /api/habits/:id ---
+router.delete('/habits/:id', async (req, res) => {
+    const decoded = verifyToken(req, res);
+    if (!decoded) return;
 
+    const habitId = parseInt(req.params.id);
+    if (isNaN(habitId)) {
+        return res.status(400).json({ error: 'Invalid habit ID.' });
+    }
+
+    try {
+        const result = await deleteHabit(habitId, decoded.user_id);
+        if (!result) {
+            return res.status(404).json({ error: 'Habit not found.' });
+        }
+        res.json({ message: 'Habit deleted successfully.' });
+    } catch (error) {
+        console.error('Delete habit error:', error);
+        res.status(500).json({ error: 'Server error deleting habit.' });
+    }
+});
 
 export default router;
