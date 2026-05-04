@@ -14,6 +14,7 @@ fetch('/api/me')
     if (data.avatar_url) {
       document.getElementById('nav-avatar').src = data.avatar_url;
     }
+     document.getElementById('stat-streak').textContent = data.streak;
     loadHabits();
   })
   .catch(() => {
@@ -23,15 +24,20 @@ fetch('/api/me')
 // --- Load all habits and today's completions ---
 const loadHabits = async () => {
   try {
-    const [habitsRes, todayRes] = await Promise.all([
+    const [habitsRes, todayRes, streakRes] = await Promise.all([
       fetch('/api/habits'),
-      fetch('/api/habits/today')
+      fetch('/api/habits/today'),
+      fetch('/api/streak')
     ]);
 
     const habits = await habitsRes.json();
     const todayHabits = await todayRes.json();
+    // Refresh streak after loading habits
+    
+    const streakData = await streakRes.json();
+    document.getElementById('stat-streak').textContent = streakData.streak;
 
-    renderHabitList(todayHabits);
+    renderHabitList(habits);
     renderTodayList(todayHabits);
     updateStats(habits, todayHabits);
   } catch (err) {

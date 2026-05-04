@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getUserByEmail, createUser, emailExists, getTasksByUserId, createTask, toggleTask, updateAvatar, getHabitsByUserId, createHabit, logHabitCompletion, removeHabitCompletion, getHabitCompletionsByDate, getHabitCompletionsById, getHabitCompletionsForWeek } from '../data/login.js';
+import { getUserByEmail, createUser, emailExists, getTasksByUserId, createTask, toggleTask, updateAvatar, getHabitsByUserId, createHabit, logHabitCompletion, removeHabitCompletion, getHabitCompletionsByDate, getHabitCompletionsById, getHabitCompletionsForWeek, calculateStreak, updateStreak, getStreak } from '../data/login.js';
 
 
 const router = express.Router();
@@ -136,7 +136,7 @@ router.post('/login', async (req, res) => {
 });
 
 // --- GET /api/me ---
-router.get('/me', (req, res) => {
+router.get('/me', async (req, res) => {
     const token = req.cookies.token;
 
     if (!token) {
@@ -145,11 +145,14 @@ router.get('/me', (req, res) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const streak = await calculateStreak(decoded.user_id);
+
         res.json({
             user_id: decoded.user_id,
             username: decoded.username,
             email: decoded.email,
-            avatar_url: decoded.avatar_url || null
+            avatar_url: decoded.avatar_url || null,
+            streak
         });
     } catch (err) {
         return res.status(401).json({ error: 'Invalid or expired session.' });
@@ -249,9 +252,68 @@ router.get('/habits', async (req, res) => {
     const decoded = verifyToken(req, res);
     if (!decoded) return;
 
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    // Calculate start (Monday) and end (Sunday) of current week
+    const dayOfWeek = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    const startDate = monday.toISOString().split('T')[0];
+    const endDate = sunday.toISOString().split('T')[0];
+
     try {
         const habits = await getHabitsByUserId(decoded.user_id);
-        res.json(habits);
+        const weekCompletions = await getHabitCompletionsForWeek(decoded.user_id, startDate, endDate);
+        const todayCompletions = await getHabitCompletionsByDate(decoded.user_id, todayStr);
+        const todayCompletedIds = todayCompletions.map(c => c.habit_id);
+
+        const result = habits.map(habit => {
+            const habitWeekCompletions = weekCompletions
+                .filter(c => c.habit_id === habit.habit_id)
+                .map(c => c.completed_date.toISOString().split('T')[0]);
+
+            // Build the 7-day strip
+            const strip = [];
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(monday);
+                day.setDate(monday.getDate() + i);
+                const dayStr = day.toISOString().split('T')[0];
+                const dayNum = day.getDay();
+                const isToday = dayStr === todayStr;
+                const isPast = day < today && !isToday;
+                const isFuture = day > today;
+                const isCompleted = habitWeekCompletions.includes(dayStr);
+
+                let isActive = false;
+                if (habit.frequency === 'daily') isActive = !isFuture;
+                if (habit.frequency === 'weekly') isActive = isToday && !isFuture;
+                if (habit.frequency === 'specific') {
+                    isActive = habit.days_of_week.includes(dayNum) && !isFuture;
+                }
+
+                strip.push({
+                    date: dayStr,
+                    dayNum,
+                    isToday,
+                    isPast,
+                    isFuture,
+                    isCompleted,
+                    isActive
+                });
+            }
+
+            return {
+                ...habit,
+                completed_today: todayCompletedIds.includes(habit.habit_id),
+                week_strip: strip
+            };
+        });
+
+        res.json(result);
     } catch (error) {
         console.error('Get habits error:', error);
         res.status(500).json({ error: 'Server error fetching habits.' });
@@ -345,6 +407,22 @@ router.get('/habits/today', async (req, res) => {
         res.status(500).json({ error: 'Server error fetching today\'s habits.' });
     }
 });
+
+
+// --- GET /api/streak ---
+router.get('/streak', async (req, res) => {
+    const decoded = verifyToken(req, res);
+    if (!decoded) return;
+
+    try {
+        const streak = await calculateStreak(decoded.user_id);
+        res.json({ streak });
+    } catch (error) {
+        console.error('Get streak error:', error);
+        res.status(500).json({ error: 'Server error fetching streak.' });
+    }
+});
+
 // --- POST /api/habits ---
 router.post('/habits', async (req, res) => {
     const decoded = verifyToken(req, res);
@@ -442,6 +520,8 @@ router.get('/habits/:id/completions', async (req, res) => {
         res.status(500).json({ error: 'Server error fetching completions.' });
     }
 });
+
+
 
 
 export default router;

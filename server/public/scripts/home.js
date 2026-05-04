@@ -14,6 +14,7 @@ fetch('/api/me')
      if (data.avatar_url) {
       document.getElementById('profileAvatar').src = data.avatar_url;
     }
+    document.getElementById('streak-count').textContent = data.streak;
     loadTasks();
     loadHabits();
   })
@@ -44,10 +45,17 @@ const loadTasks = async () => {
 // --- Load and render today's habits ---
 const loadHabits = async () => {
   try {
-    const res = await fetch('/api/habits/today');
-    if (!res.ok) return;
-    const habits = await res.json();
-    renderHabits(habits);
+
+
+      const [habitsRes, todayRes] = await Promise.all([
+      fetch('/api/habits'),
+      fetch('/api/habits/today')
+    ]);
+    const habits = await habitsRes.json();
+    const todayHabits = await todayRes.json();
+    renderHabits(todayHabits);
+    document.getElementById('stat-habits-formed').textContent = habits.length;
+
   } catch (err) {
     console.error('Error loading habits:', err);
   }

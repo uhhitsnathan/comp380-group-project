@@ -173,3 +173,151 @@ export const getHabitCompletionsForWeek = async (userId, startDate, endDate) => 
     );
     return result.rows;
 };
+
+
+
+// Update a user's streak
+export const updateStreak = async (userId, streak) => {
+    const result = await pool.query(
+        `UPDATE users
+         SET streak = $1
+         WHERE user_id = $2
+         RETURNING streak`,
+        [streak, userId]
+    );
+    return result.rows[0];
+};
+
+// Calculate a user's current streak
+export const calculateStreak = async (userId) => {
+    // Get all habits for the user
+    const habitsResult = await pool.query(
+        `SELECT habit_id, frequency, days_of_week, created_at
+         FROM habits
+         WHERE user_id = $1`,
+        [userId]
+    );
+    const habits = habitsResult.rows;
+
+    // No habits = no streak
+    if (habits.length === 0) {
+        await updateStreak(userId, 0);
+        return 0;
+    }
+
+    // Get all completions for this user
+    const completionsResult = await pool.query(
+        `SELECT habit_id, completed_date
+         FROM habit_completions
+         WHERE user_id = $1
+         ORDER BY completed_date DESC`,
+        [userId]
+    );
+    const completions = completionsResult.rows.map(c => ({
+        habit_id: c.habit_id,
+        date: c.completed_date.toISOString().split('T')[0]
+    }));
+
+    // Helper: get Monday of a given date's week
+    const getMonday = (date) => {
+        const d = new Date(date);
+        const day = d.getDay();
+        d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+        d.setHours(0, 0, 0, 0);
+        return d;
+    };
+
+    // Helper: check if a habit was completed for a given week
+    const wasHabitCompletedForWeek = (habit, weekMonday) => {
+        const weekStart = new Date(weekMonday);
+        const weekEnd = new Date(weekMonday);
+        weekEnd.setDate(weekStart.getDate() + 6);
+
+        const weekStartStr = weekStart.toISOString().split('T')[0];
+        const weekEndStr = weekEnd.toISOString().split('T')[0];
+
+        // Get completions for this habit in this week
+        const habitCompletions = completions
+            .filter(c => c.habit_id === habit.habit_id && c.date >= weekStartStr && c.date <= weekEndStr)
+            .map(c => c.date);
+
+        if (habit.frequency === 'daily') {
+            // Must be completed every day Mon-Sun
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(weekStart);
+                day.setDate(weekStart.getDate() + i);
+                const dayStr = day.toISOString().split('T')[0];
+                // Don't require future days
+                if (day > new Date()) break;
+                if (!habitCompletions.includes(dayStr)) return false;
+            }
+            return true;
+        }
+
+        if (habit.frequency === 'weekly') {
+            // Must be completed at least once during the week
+            return habitCompletions.length > 0;
+        }
+
+        if (habit.frequency === 'specific') {
+            // Must be completed on every selected day that has passed
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(weekStart);
+                day.setDate(weekStart.getDate() + i);
+                if (day > new Date()) break;
+                const dayNum = day.getDay();
+                const dayStr = day.toISOString().split('T')[0];
+                if (habit.days_of_week.includes(dayNum)) {
+                    if (!habitCompletions.includes(dayStr)) return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    };
+
+    // Walk back week by week and count streak
+    let streak = 0;
+    const today = new Date();
+    let weekMonday = getMonday(today);
+
+    // Check up to 52 weeks back
+    for (let i = 0; i < 52; i++) {
+        // Skip the current week if it hasn't ended yet
+        const weekSunday = new Date(weekMonday);
+        weekSunday.setDate(weekMonday.getDate() + 6);
+        const isCurrentWeek = today >= weekMonday && today <= weekSunday;
+
+        if (isCurrentWeek && i === 0) {
+            // For the current week, only count it if all habits are done so far
+            const allDone = habits.every(habit => wasHabitCompletedForWeek(habit, weekMonday));
+            if (allDone) streak++;
+            else {
+                // Current week incomplete — go back one more week to check past streak
+                weekMonday.setDate(weekMonday.getDate() - 7);
+                continue;
+            }
+        } else {
+            // For past weeks, all habits must be fully completed
+            const allDone = habits.every(habit => wasHabitCompletedForWeek(habit, weekMonday));
+            if (allDone) streak++;
+            else break; // Streak broken
+        }
+
+        // Go back one week
+        weekMonday.setDate(weekMonday.getDate() - 7);
+    }
+
+    await updateStreak(userId, streak);
+    return streak;
+};
+
+// Get a user's current streak
+export const getStreak = async (userId) => {
+    const result = await pool.query(
+        `SELECT streak FROM users WHERE user_id = $1`,
+        [userId]
+    );
+    return result.rows[0]?.streak || 0;
+};

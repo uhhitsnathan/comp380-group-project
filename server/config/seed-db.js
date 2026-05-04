@@ -25,6 +25,7 @@ const createTables = async () => {
                 email      TEXT NOT NULL UNIQUE,
                 password   TEXT NOT NULL,
                 avatar_url TEXT DEFAULT NULL,
+                streak INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT NOW()
             );
         `);
