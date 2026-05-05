@@ -430,6 +430,27 @@ router.get('/streak', async (req, res) => {
     }
 });
 
+router.get('/debug-streak', async (req, res) => {
+    const decoded = verifyToken(req, res);
+    if (!decoded) return;
+
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+    const startDate = monday.toISOString().split('T')[0];
+    const endDate = new Date(monday);
+    endDate.setDate(monday.getDate() + 6);
+
+    res.json({
+        today: today.toISOString().split('T')[0],
+        weekStart: startDate,
+        weekEnd: endDate.toISOString().split('T')[0],
+        dayOfWeek
+    });
+});
+
 // --- POST /api/habits ---
 router.post('/habits', async (req, res) => {
     const decoded = verifyToken(req, res);

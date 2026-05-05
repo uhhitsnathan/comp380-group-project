@@ -45,8 +45,6 @@ const loadTasks = async () => {
 // --- Load and render today's habits ---
 const loadHabits = async () => {
   try {
-
-
       const [habitsRes, todayRes] = await Promise.all([
       fetch('/api/habits'),
       fetch('/api/habits/today')

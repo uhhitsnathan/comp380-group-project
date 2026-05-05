@@ -33,7 +33,6 @@ const loadHabits = async () => {
     const habits = await habitsRes.json();
     const todayHabits = await todayRes.json();
     // Refresh streak after loading habits
-    
     const streakData = await streakRes.json();
     document.getElementById('stat-streak').textContent = streakData.streak;
 
@@ -130,7 +129,7 @@ const renderHabitList = (habits) => {
     return '';
   };
 
-list.innerHTML = habits.map(habit => `
+  list.innerHTML = habits.map(habit => `
     <div class="bg-surface-container-high p-5 flex flex-col md:flex-row md:items-center gap-6 group hover:bg-surface-container-highest transition-all duration-300">
       <div class="flex-1 flex flex-col gap-1">
         <div class="flex items-center gap-3">
@@ -144,14 +143,14 @@ list.innerHTML = habits.map(habit => `
       <div class="flex items-center gap-1.5">
         ${habit.week_strip.map(day => renderDaySquare(day, habit.habit_id)).join('')}
       </div>
-
-      <!-- Delete button -->
+         <!-- Delete button -->
       <button
         onclick="handleDeleteHabit(${habit.habit_id})"
         class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold text-error uppercase hover:bg-error/10 px-2 py-1 rounded">
         <span class="material-symbols-outlined text-lg">delete</span>
         Remove
       </button>
+    </div>
     </div>
   `).join('');
 };
@@ -205,22 +204,6 @@ const handleDayToggle = async (habitId, date, isCompleted) => {
   }
 };
 
-// --- Delete a habit ---
-const handleDeleteHabit = async (habitId) => {
-  if (!confirm('Are you sure you want to remove this habit? All completion history will be lost.')) return;
-
-  try {
-    const res = await fetch(`/api/habits/${habitId}`, { method: 'DELETE' });
-    if (!res.ok) {
-      console.error('Failed to delete habit');
-      return;
-    }
-    loadHabits();
-  } catch (err) {
-    console.error('Error deleting habit:', err);
-  }
-};
-
 // --- Handle sidebar checkbox toggle ---
 const handleTodayToggle = async (habitId, checkbox) => {
   const today = new Date().toISOString().split('T')[0];
@@ -242,6 +225,23 @@ const handleTodayToggle = async (habitId, checkbox) => {
   } catch (err) {
     console.error('Error toggling habit:', err);
     checkbox.checked = !checkbox.checked;
+  }
+};
+
+
+// --- Delete a habit ---
+const handleDeleteHabit = async (habitId) => {
+  if (!confirm('Are you sure you want to remove this habit? All completion history will be lost.')) return;
+
+  try {
+    const res = await fetch(`/api/habits/${habitId}`, { method: 'DELETE' });
+    if (!res.ok) {
+      console.error('Failed to delete habit');
+      return;
+    }
+    loadHabits();
+  } catch (err) {
+    console.error('Error deleting habit:', err);
   }
 };
 
