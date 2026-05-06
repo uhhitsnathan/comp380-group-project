@@ -4,12 +4,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getUserByEmail, createUser, emailExists,
-    getTasksByUserId, createTask, toggleTask,
+import { getUserByEmail, createUser, emailExists, getTasksByUserId,
+    createTask, toggleTask,
     updateAvatar,
     getHabitsByUserId, createHabit, logHabitCompletion, removeHabitCompletion, getHabitCompletionsByDate, getHabitCompletionsById, getHabitCompletionsForWeek,
-    calculateStreak, updateStreak, getStreak,
-    deleteHabit } from '../data/login.js';
+    calculateStreak, updateStreak, getStreak, deleteHabit,
+    getBadgesByUserId, checkAndAwardBadges, BADGE_MILESTONES } from '../data/login.js';
 
 
 const router = express.Router();
@@ -153,13 +153,17 @@ router.get('/me', async (req, res) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const streak = await calculateStreak(decoded.user_id);
+        await checkAndAwardBadges(decoded.user_id, streak);
+        const badges = await getBadgesByUserId(decoded.user_id);
+
 
         res.json({
             user_id: decoded.user_id,
             username: decoded.username,
             email: decoded.email,
             avatar_url: decoded.avatar_url || null,
-            streak
+            streak,
+            badges
         });
     } catch (err) {
         return res.status(401).json({ error: 'Invalid or expired session.' });
@@ -427,6 +431,32 @@ router.get('/streak', async (req, res) => {
     } catch (error) {
         console.error('Get streak error:', error);
         res.status(500).json({ error: 'Server error fetching streak.' });
+    }
+});
+
+// --- GET /api/badges ---
+router.get('/badges', async (req, res) => {
+    const decoded = verifyToken(req, res);
+    if (!decoded) return;
+
+    try {
+        const streak = await calculateStreak(decoded.user_id);
+        await checkAndAwardBadges(decoded.user_id, streak);
+        const badges = await getBadgesByUserId(decoded.user_id);
+
+        // Attach full badge info from BADGE_MILESTONES to each earned badge
+        const result = badges.map(badge => {
+            const milestone = BADGE_MILESTONES.find(m => m.key === badge.badge_key);
+            return {
+                ...badge,
+                ...milestone
+            };
+        });
+
+        res.json(result);
+    } catch (error) {
+        console.error('Get badges error:', error);
+        res.status(500).json({ error: 'Server error fetching badges.' });
     }
 });
 

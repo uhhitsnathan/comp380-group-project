@@ -15,6 +15,7 @@ fetch('/api/me')
       document.getElementById('profileAvatar').src = data.avatar_url;
     }
     document.getElementById('streak-count').textContent = data.streak;
+    renderBadges(data.badges);
     loadTasks();
     loadHabits();
   })
@@ -57,6 +58,38 @@ const loadHabits = async () => {
   } catch (err) {
     console.error('Error loading habits:', err);
   }
+};
+
+// --- Render badges ---
+const renderBadges = (badges) => {
+  const badgeList = document.getElementById('badge-list');
+
+  const allBadges = [
+    { key: 'first_step', label: 'First Step', description: '1 week streak', icon: '🥉' },
+    { key: 'consistent', label: 'Consistent', description: '4 week streak', icon: '🥈' },
+    { key: 'dedicated', label: 'Dedicated', description: '8 week streak', icon: '🥇' },
+    { key: 'elite', label: 'Elite', description: '12 week streak', icon: '💎' },
+    { key: 'unstoppable', label: 'Unstoppable', description: '24 week streak', icon: '🔥' },
+  ];
+
+  const earnedKeys = badges.map(b => b.badge_key);
+
+  badgeList.innerHTML = allBadges.map(badge => {
+    const earned = earnedKeys.includes(badge.key);
+    return `
+      <div class="flex flex-col items-center gap-3 p-6 rounded-lg border ${earned
+        ? 'bg-surface-container-high border-primary/40 hover:shadow-[0_0_20px_rgba(226,254,76,0.15)]'
+        : 'bg-surface-container border-outline-variant/20 opacity-40'
+      } transition-all">
+        <span class="text-5xl">${badge.icon}</span>
+        <div class="text-center">
+          <p class="font-['Space_Grotesk'] font-bold text-sm uppercase tracking-wide ${earned ? 'text-on-surface' : 'text-on-surface-variant'}">${badge.label}</p>
+          <p class="font-['Lexend'] text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">${badge.description}</p>
+        </div>
+        ${earned ? `<span class="font-['Lexend'] text-[9px] text-primary uppercase tracking-widest font-bold">Earned</span>` : `<span class="font-['Lexend'] text-[9px] text-on-surface-variant uppercase tracking-widest">Locked</span>`}
+      </div>
+    `;
+  }).join('');
 };
 
 // --- Render today's habits ---

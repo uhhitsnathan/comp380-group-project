@@ -190,85 +190,74 @@ export const updateStreak = async (userId, streak) => {
 
 // Calculate a user's current streak
 export const calculateStreak = async (userId) => {
-    // Get all habits for the user
     const habitsResult = await pool.query(
-        `SELECT habit_id, frequency, days_of_week, created_at
-         FROM habits
-         WHERE user_id = $1`,
+        `SELECT habit_id, frequency, days_of_week FROM habits WHERE user_id = $1`,
         [userId]
     );
     const habits = habitsResult.rows;
 
-    // No habits = no streak
     if (habits.length === 0) {
         await updateStreak(userId, 0);
         return 0;
     }
 
-    // Get all completions for this user
     const completionsResult = await pool.query(
-        `SELECT habit_id, completed_date
+        `SELECT habit_id, TO_CHAR(completed_date, 'YYYY-MM-DD') as date
          FROM habit_completions
-         WHERE user_id = $1
-         ORDER BY completed_date DESC`,
+         WHERE user_id = $1`,
         [userId]
     );
-    const completions = completionsResult.rows.map(c => ({
-        habit_id: c.habit_id,
-        date: c.completed_date.toISOString().split('T')[0]
-    }));
+    const completions = completionsResult.rows;
 
-    // Helper: get Monday of a given date's week
-    const getMonday = (date) => {
-        const d = new Date(date);
-        const day = d.getDay();
-        d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
-        d.setHours(0, 0, 0, 0);
-        return d;
+    // Get today's date as a simple YYYY-MM-DD string using local time
+    const todayStr = new Date().toLocaleDateString('en-CA'); // en-CA gives YYYY-MM-DD
+
+    // Get Monday of a week given any date string YYYY-MM-DD
+    const getMondayStr = (dateStr) => {
+        const d = new Date(dateStr + 'T12:00:00'); // noon to avoid DST issues
+        const day = d.getDay(); // 0=Sun, 1=Mon...
+        const diff = day === 0 ? -6 : 1 - day;
+        d.setDate(d.getDate() + diff);
+        return d.toLocaleDateString('en-CA');
     };
 
-    // Helper: check if a habit was completed for a given week
-    const wasHabitCompletedForWeek = (habit, weekMonday) => {
-        const weekStart = new Date(weekMonday);
-        const weekEnd = new Date(weekMonday);
-        weekEnd.setDate(weekStart.getDate() + 6);
+    // Get all dates in a week given its Monday date string
+    const getWeekDates = (mondayStr) => {
+        const dates = [];
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(mondayStr + 'T12:00:00');
+            d.setDate(d.getDate() + i);
+            dates.push(d.toLocaleDateString('en-CA'));
+        }
+        return dates;
+    };
 
-        const weekStartStr = weekStart.toISOString().split('T')[0];
-        const weekEndStr = weekEnd.toISOString().split('T')[0];
-
-        // Get completions for this habit in this week
+    // Check if a habit was fully completed for a given week
+    const wasHabitCompletedForWeek = (habit, mondayStr) => {
+        const weekDates = getWeekDates(mondayStr);
         const habitCompletions = completions
-            .filter(c => c.habit_id === habit.habit_id && c.date >= weekStartStr && c.date <= weekEndStr)
+            .filter(c => c.habit_id === habit.habit_id && weekDates.includes(c.date))
             .map(c => c.date);
 
         if (habit.frequency === 'daily') {
-            // Must be completed every day Mon-Sun
-            for (let i = 0; i < 7; i++) {
-                const day = new Date(weekStart);
-                day.setDate(weekStart.getDate() + i);
-                const dayStr = day.toISOString().split('T')[0];
-                // Don't require future days
-                if (day > new Date()) break;
-                if (!habitCompletions.includes(dayStr)) return false;
+            // Every day up to and including today must be completed
+            for (const date of weekDates) {
+                if (date > todayStr) break; // don't require future days
+                if (!habitCompletions.includes(date)) return false;
             }
             return true;
         }
 
         if (habit.frequency === 'weekly') {
-            // Must be completed at least once during the week
             return habitCompletions.length > 0;
         }
 
         if (habit.frequency === 'specific') {
-            // Must be completed on every selected day that has passed
-            for (let i = 0; i < 7; i++) {
-                const day = new Date(weekStart);
-                day.setDate(weekStart.getDate() + i);
-                if (day > new Date()) break;
-                const dayNum = day.getDay();
-                const dayStr = day.toISOString().split('T')[0];
+            for (const date of weekDates) {
+                if (date > todayStr) break;
+                const dayNum = new Date(date + 'T12:00:00').getDay();
                 if (habit.days_of_week.includes(dayNum)) {
-                    if (!habitCompletions.includes(dayStr)) return false;
+                    if (!habitCompletions.includes(date)) return false;
                 }
             }
             return true;
@@ -277,42 +266,39 @@ export const calculateStreak = async (userId) => {
         return false;
     };
 
-    // Walk back week by week and count streak
+    // Walk back week by week
     let streak = 0;
-    const today = new Date();
-    let weekMonday = getMonday(today);
+    let mondayStr = getMondayStr(todayStr);
 
-    // Check up to 52 weeks back
     for (let i = 0; i < 52; i++) {
-        // Skip the current week if it hasn't ended yet
-        const weekSunday = new Date(weekMonday);
-        weekSunday.setDate(weekMonday.getDate() + 6);
-        const isCurrentWeek = today >= weekMonday && today <= weekSunday;
+        const weekDates = getWeekDates(mondayStr);
+        const sundayStr = weekDates[6];
+        const isCurrentWeek = todayStr >= mondayStr && todayStr <= sundayStr;
 
-        if (isCurrentWeek && i === 0) {
-            // For the current week, only count it if all habits are done so far
-            const allDone = habits.every(habit => wasHabitCompletedForWeek(habit, weekMonday));
-            if (allDone) streak++;
-            else {
-                // Current week incomplete — go back one more week to check past streak
-                weekMonday.setDate(weekMonday.getDate() - 7);
-                continue;
-            }
+
+        const allDone = habits.every(habit => {
+            const result = wasHabitCompletedForWeek(habit, mondayStr);
+            return result;
+        });
+
+
+        if (allDone) {
+            streak++;
+        } else if (isCurrentWeek) {
+            // Current week not done yet — don't break, just skip it and check last week
         } else {
-            // For past weeks, all habits must be fully completed
-            const allDone = habits.every(habit => wasHabitCompletedForWeek(habit, weekMonday));
-            if (allDone) streak++;
-            else break; // Streak broken
+            break; // Past week was missed — streak is broken
         }
 
         // Go back one week
-        weekMonday.setDate(weekMonday.getDate() - 7);
+        const prevMonday = new Date(mondayStr + 'T12:00:00');
+        prevMonday.setDate(prevMonday.getDate() - 7);
+        mondayStr = prevMonday.toLocaleDateString('en-CA');
     }
 
     await updateStreak(userId, streak);
     return streak;
 };
-
 // Get a user's current streak
 export const getStreak = async (userId) => {
     const result = await pool.query(
@@ -331,4 +317,53 @@ export const deleteHabit = async (habitId, userId) => {
         [habitId, userId]
     );
     return result.rows[0];
+};
+
+
+
+
+// Badge definitions
+export const BADGE_MILESTONES = [
+    { key: 'first_step', label: 'First Step', description: 'Complete a 1 week streak', weeks: 1, icon: '🥉' },
+    { key: 'consistent', label: 'Consistent', description: 'Complete a 4 week streak', weeks: 4, icon: '🥈' },
+    { key: 'dedicated', label: 'Dedicated', description: 'Complete an 8 week streak', weeks: 8, icon: '🥇' },
+    { key: 'elite', label: 'Elite', description: 'Complete a 12 week streak', weeks: 12, icon: '💎' },
+    { key: 'unstoppable', label: 'Unstoppable', description: 'Complete a 24 week streak', weeks: 24, icon: '🔥' },
+];
+
+// Get all badges for a user
+export const getBadgesByUserId = async (userId) => {
+    const result = await pool.query(
+        `SELECT badge_key, earned_at
+         FROM badges
+         WHERE user_id = $1
+         ORDER BY earned_at ASC`,
+        [userId]
+    );
+    return result.rows;
+};
+
+// Check streak against milestones and award any new badges
+export const checkAndAwardBadges = async (userId, streak) => {
+    // Get badges the user already has
+    const existing = await getBadgesByUserId(userId);
+    const existingKeys = existing.map(b => b.badge_key);
+
+    // Find milestones the user has reached but hasn't been awarded yet
+    const newBadges = BADGE_MILESTONES.filter(
+        badge => streak >= badge.weeks && !existingKeys.includes(badge.key)
+    );
+
+    // Award each new badge
+    for (const badge of newBadges) {
+        await pool.query(
+            `INSERT INTO badges (user_id, badge_key)
+             VALUES ($1, $2)
+             ON CONFLICT DO NOTHING`,
+            [userId, badge.key]
+        );
+        console.log(`Awarded badge: ${badge.label} to user ${userId}`);
+    }
+
+    return newBadges;
 };
