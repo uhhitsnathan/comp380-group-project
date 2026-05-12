@@ -1,6 +1,65 @@
 import { pool } from './database.js';
 import bcrypt from 'bcrypt';
 
+
+//helper functions for getting the day
+
+const STREAK_WEEKS = 5;
+function formatDate(date) {
+    return date.toISOString().split('T')[0];
+}
+
+function getStartOfCurrentWeek() {
+    const today = new Date();
+    const day = today.getDay(); // Sunday = 0, Monday = 1
+    const diff = day === 0 ? -6 : 1 - day;
+
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    monday.setHours(0, 0, 0, 0);
+
+    return monday;
+}
+
+function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
+
+function generateStreakDates(streakWeeks) {
+    const currentWeekStart = getStartOfCurrentWeek();
+    const firstWeekStart = addDays(currentWeekStart, -(streakWeeks * 7));
+
+    const dailyDates = [];
+    const gymDates = [];
+    const weeklyReviewDates = [];
+
+    for (let week = 0; week < streakWeeks; week++) {
+        const weekStart = addDays(firstWeekStart, week * 7);
+
+        // Daily habits: Monday through Sunday
+        for (let day = 0; day < 7; day++) {
+            dailyDates.push(formatDate(addDays(weekStart, day)));
+        }
+
+        // Specific habit: Monday, Wednesday, Friday
+        gymDates.push(formatDate(addDays(weekStart, 0)));
+        gymDates.push(formatDate(addDays(weekStart, 2)));
+        gymDates.push(formatDate(addDays(weekStart, 4)));
+
+        // Weekly habit: Sunday
+        weeklyReviewDates.push(formatDate(addDays(weekStart, 6)));
+    }
+
+    return {
+        dailyDates,
+        gymDates,
+        weeklyReviewDates
+    };
+}
+
+
 const dropTables = async () => {
     try {
         console.log('dropping tables...');
@@ -175,111 +234,13 @@ const insertData = async () => {
         const gymId = habit3.rows[0].habit_id;
         const weeklyReviewId = habit4.rows[0].habit_id;
 
-        const dailyDates = [
-            // Week 1: 2026-03-30 to 2026-04-05
-            '2026-03-30', '2026-03-31', '2026-04-01', '2026-04-02', '2026-04-03', '2026-04-04', '2026-04-05',
+       
+       const {
+            dailyDates,
+            gymDates,
+            weeklyReviewDates
+        } = generateStreakDates(STREAK_WEEKS);
 
-            // Week 2: 2026-04-06 to 2026-04-12
-            '2026-04-06', '2026-04-07', '2026-04-08', '2026-04-09', '2026-04-10', '2026-04-11', '2026-04-12',
-
-            // Week 3: 2026-04-13 to 2026-04-19
-            '2026-04-13', '2026-04-14', '2026-04-15', '2026-04-16', '2026-04-17', '2026-04-18', '2026-04-19',
-
-            // Week 4: 2026-04-20 to 2026-04-26
-            '2026-04-20', '2026-04-21', '2026-04-22', '2026-04-23', '2026-04-24', '2026-04-25', '2026-04-26',
-
-            // Week 5: 2026-04-27 to 2026-05-03
-            '2026-04-27', '2026-04-28', '2026-04-29', '2026-04-30', '2026-05-01', '2026-05-02', '2026-05-03'
-        ];
-
-        const gymDates = [
-            // Week 1: Monday, Wednesday, Friday
-            '2026-03-30', '2026-04-01', '2026-04-03',
-
-            // Week 2: Monday, Wednesday, Friday
-            '2026-04-06', '2026-04-08', '2026-04-10',
-
-            // Week 3: Monday, Wednesday, Friday
-            '2026-04-13', '2026-04-15', '2026-04-17',
-
-            // Week 4: Monday, Wednesday, Friday
-            '2026-04-20', '2026-04-22', '2026-04-24',
-
-            // Week 5: Monday, Wednesday, Friday
-            '2026-04-27', '2026-04-29', '2026-05-01'
-        ];
-
-        const weeklyReviewDates = [
-            '2026-04-05',
-            '2026-04-12',
-            '2026-04-19',
-            '2026-04-26',
-            '2026-05-03'
-        ];
-
-    //test data for 8 week streak (uncomment and change dailyDates, gymDates, and weeklyReviewDates above to match the dates below)
-    /* const dailyDates = [
-    // Week 1
-    '2026-03-09','2026-03-10','2026-03-11','2026-03-12','2026-03-13','2026-03-14','2026-03-15',
-
-    // Week 2
-    '2026-03-16','2026-03-17','2026-03-18','2026-03-19','2026-03-20','2026-03-21','2026-03-22',
-
-    // Week 3
-    '2026-03-23','2026-03-24','2026-03-25','2026-03-26','2026-03-27','2026-03-28','2026-03-29',
-
-    // Week 4
-    '2026-03-30','2026-03-31','2026-04-01','2026-04-02','2026-04-03','2026-04-04','2026-04-05',
-
-    // Week 5
-    '2026-04-06','2026-04-07','2026-04-08','2026-04-09','2026-04-10','2026-04-11','2026-04-12',
-
-    // Week 6
-    '2026-04-13','2026-04-14','2026-04-15','2026-04-16','2026-04-17','2026-04-18','2026-04-19',
-
-    // Week 7
-    '2026-04-20','2026-04-21','2026-04-22','2026-04-23','2026-04-24','2026-04-25','2026-04-26',
-
-    // Week 8
-    '2026-04-27','2026-04-28','2026-04-29','2026-04-30','2026-05-01','2026-05-02','2026-05-03'
-];
-const gymDates = [
-    // Week 1
-    '2026-03-09','2026-03-11','2026-03-13',
-
-    // Week 2
-    '2026-03-16','2026-03-18','2026-03-20',
-
-    // Week 3
-    '2026-03-23','2026-03-25','2026-03-27',
-
-    // Week 4
-    '2026-03-30','2026-04-01','2026-04-03',
-
-    // Week 5
-    '2026-04-06','2026-04-08','2026-04-10',
-
-    // Week 6
-    '2026-04-13','2026-04-15','2026-04-17',
-
-    // Week 7
-    '2026-04-20','2026-04-22','2026-04-24',
-
-    // Week 8
-    '2026-04-27','2026-04-29','2026-05-01'
-];
-const weeklyReviewDates = [
-    '2026-03-15',
-    '2026-03-22',
-    '2026-03-29',
-    '2026-04-05',
-    '2026-04-12',
-    '2026-04-19',
-    '2026-04-26',
-    '2026-05-03'
-];
-
-*/
 
         await insertDailyCompletions(morningRunId, userId, dailyDates);
         await insertDailyCompletions(readId, userId, dailyDates);

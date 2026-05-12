@@ -189,9 +189,22 @@ router.post('/avatar', upload.single('avatar'), async (req, res) => {
     }
 
     try {
-        // Build the public URL path to the saved file
         const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
         await updateAvatar(decoded.user_id, avatarUrl);
+
+        // Create an updated user object with the new avatar_url
+        const updatedUser = {
+            user_id: decoded.user_id,
+            username: decoded.username,
+            email: decoded.email,
+            avatar_url: avatarUrl
+        };
+
+        // Re-sign the JWT so /api/me immediately has the new avatar_url
+        const newToken = signToken(updatedUser);
+        sendTokenCookie(res, newToken);
+
         res.json({ avatar_url: avatarUrl });
     } catch (error) {
         console.error('Avatar upload error:', error);
